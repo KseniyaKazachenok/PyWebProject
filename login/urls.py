@@ -3,5 +3,5 @@ from .views import IndexView
 
 
 urlpatterns = [
-    path('login/', IndexView.as_view()),
+    path('', IndexView.as_view()),
 ]
