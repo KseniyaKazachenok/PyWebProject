@@ -33,14 +33,6 @@ class ShopView(View):
 
         return render(request, 'store/shop.html', {'data': products})
 
-    def add_to_wishlist(self, id):
-        if Wishlist.product == id:
-            return redirect('store:shop')
-        else:
-            wish_list_item = Wishlist(product=id, user=self.request.user)
-            wish_list_item.save()
-            return redirect('store:shop')
-
 
 class CartView(View):
     def get(self, request):
@@ -103,7 +95,22 @@ class ProductSingleView(View):
 class WishlistView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, "store/wishlist.html")
+            wishlist = Wishlist.objects.filter(user=request.user)
+            return render(request, "store/wishlist.html", {'data': wishlist})
+        return redirect('login:login')
+
+
+class AddWishlistView(View):
+    def post(self, request, id):
+        if request.user.is_authenticated:
+            product = get_object_or_404(Product, id=id)
+            wishlist_item_check = Wishlist.objects.filter(user=request.user, product=product)
+            if wishlist_item_check.exists():
+                return redirect('store:shop')
+            else:
+                wishlist_item = Wishlist(user=request.user, product=product)
+                wishlist_item.save()
+                return redirect('store:shop')
         return redirect('login:login')
 
 
